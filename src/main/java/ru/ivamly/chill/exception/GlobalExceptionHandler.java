@@ -1,5 +1,6 @@
 package ru.ivamly.chill.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import java.time.Instant;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(OverlappingChillException.class)
-    public ResponseEntity<ProblemDetail> handleNotFound(OverlappingChillException ex) {
+    public ResponseEntity<ProblemDetail> handle(OverlappingChillException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Существует chill в выбранные даты");
         problem.setProperty("timestamp", Instant.now());
@@ -22,6 +23,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problem.setProperty("startDate", ex.getStartDate());
         problem.setProperty("endDate", ex.getEndDate());
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(problem);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handle(EntityNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Not Found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(problem);
     }
 }

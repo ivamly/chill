@@ -3,6 +3,8 @@ package ru.ivamly.chill.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,8 +12,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ivamly.chill.dto.CreateChillRq;
 import ru.ivamly.chill.dto.CreateChillRs;
+import ru.ivamly.chill.dto.GetChillRs;
 import ru.ivamly.chill.mapper.ChillMapper;
 import ru.ivamly.chill.service.ChillService;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("chill")
@@ -24,10 +29,17 @@ public class ChillController { // TODO добавить сваггер
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateChillRs create(@RequestBody @Valid CreateChillRq request) {
-        return chillMapper.map(
+        return chillMapper.mapToCreateChillRs(
                 chillService.create(
                         chillMapper.map(request)
                 )
+        );
+    }
+
+    @GetMapping("/{id}")
+    public GetChillRs get(@PathVariable UUID id) {
+        return chillMapper.mapToGetChillRs(
+                chillService.get(id)
         );
     }
 }
