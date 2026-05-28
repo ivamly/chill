@@ -10,10 +10,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
         configurer.usePathSegment(1).setDefaultVersion("1");
     }
 
+    @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.addPathPrefix("/api/{version}", HandlerTypePredicate.forAnnotation(RestController.class));
     }

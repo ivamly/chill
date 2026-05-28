@@ -14,7 +14,7 @@ public class ChillService {
     // TODO разобраться с транзакцией
     public Chill create(Chill chill) {
         if (chillRepository.existsOverlappingChill(chill.getUserId(), chill.getStartDate(), chill.getEndDate())) {
-            throw new RuntimeException(); // TODO продумать ошибку
+            throw new IllegalStateException("Заявка пересекается с уже существуюшей");
         }
         return chillRepository.save(chill);
     }
