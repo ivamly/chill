@@ -12,21 +12,11 @@ public record CreateChillRq(
         UUID userId, // TODO это поле будет браться из LDAP?
         @NotNull
         ChillType type,
-        @NotNull
         LocalDate startDate,
-        @NotNull
         LocalDate endDate
 ) {
     @AssertTrue
     public boolean isStartBeforeOrEqualEnd() {
-        return !startDate.isAfter(endDate);
-    }
-
-    @AssertTrue
-    public boolean isOffChillLastOneDay() {
-        if (ChillType.SICK == type) {
-            return true;
-        }
-        return startDate.isEqual(endDate);
+        return startDate != null && endDate != null && !startDate.isAfter(endDate);
     }
 }

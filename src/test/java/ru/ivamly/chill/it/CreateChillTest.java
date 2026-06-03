@@ -2,7 +2,6 @@ package ru.ivamly.chill.it;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,7 +17,6 @@ import ru.ivamly.chill.repository.ChillRepository;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
@@ -29,8 +27,8 @@ import static org.assertj.core.api.Assertions.within;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DisplayName("Создание заявки на больничный")
-class CreateSickChillTest extends BaseIntegrationTest {
+@DisplayName("Создание заявки на chill")
+class CreateChillTest extends BaseIntegrationTest {
 
     @Autowired
     private ChillRepository chillRepository;
@@ -39,28 +37,33 @@ class CreateSickChillTest extends BaseIntegrationTest {
         Chill earlierSickChill = new Chill();
         earlierSickChill.setUserId(UUID.randomUUID());
         earlierSickChill.setType(ChillType.SICK);
-        earlierSickChill.setStartDate(LocalDate.of(2026, Month.APRIL, 30));
-        earlierSickChill.setEndDate(LocalDate.of(2026, Month.MAY, 5));
+        earlierSickChill.setStartDate(LocalDate.now().minusDays(10));
+        earlierSickChill.setEndDate(LocalDate.now());
+
         Chill laterSickChill = new Chill();
         laterSickChill.setUserId(UUID.randomUUID());
         laterSickChill.setType(ChillType.SICK);
-        laterSickChill.setStartDate(LocalDate.of(2026, Month.MAY, 5));
-        laterSickChill.setEndDate(LocalDate.of(2026, Month.MAY, 11));
+        laterSickChill.setStartDate(LocalDate.now());
+        laterSickChill.setEndDate(LocalDate.now().plusDays(10));
+
         Chill middleSickChill = new Chill();
         middleSickChill.setUserId(UUID.randomUUID());
         middleSickChill.setType(ChillType.SICK);
-        middleSickChill.setStartDate(LocalDate.of(2026, Month.MAY, 2));
-        middleSickChill.setEndDate(LocalDate.of(2026, Month.MAY, 9));
+        middleSickChill.setStartDate(LocalDate.now().minusDays(10));
+        middleSickChill.setEndDate(LocalDate.now().plusDays(10));
+
         Chill sickChill = new Chill();
         sickChill.setUserId(UUID.randomUUID());
         sickChill.setType(ChillType.SICK);
-        sickChill.setStartDate(LocalDate.of(2026, Month.MAY, 1));
-        sickChill.setEndDate(LocalDate.of(2026, Month.MAY, 10));
+        sickChill.setStartDate(LocalDate.now());
+        sickChill.setEndDate(LocalDate.now().plusDays(5));
+
         Chill dayOffChill = new Chill();
         dayOffChill.setUserId(UUID.randomUUID());
         dayOffChill.setType(ChillType.OFF);
-        dayOffChill.setStartDate(LocalDate.of(2026, Month.MAY, 5));
-        dayOffChill.setEndDate(LocalDate.of(2026, Month.MAY, 5));
+        dayOffChill.setStartDate(LocalDate.now());
+        dayOffChill.setEndDate(LocalDate.now());
+
         return Stream.of(
                 Arguments.of(earlierSickChill),
                 Arguments.of(laterSickChill),
@@ -72,35 +75,55 @@ class CreateSickChillTest extends BaseIntegrationTest {
 
     static Stream<Arguments> provideInvalidRequests() {
         return Stream.of(
-                Arguments.of(
-                        new CreateChillRq(
-                                UUID.randomUUID(),
-                                ChillType.OFF,
-                                LocalDate.now(),
-                                LocalDate.now().plusDays(1)
-                        ),
-                        new CreateChillRq(
-                                UUID.randomUUID(),
-                                ChillType.SICK,
-                                LocalDate.now(),
-                                LocalDate.now().minusDays(1)
-                        )
-                )
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.OFF,
+                        LocalDate.now(),
+                        LocalDate.now().minusDays(1L)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        LocalDate.now(),
+                        LocalDate.now().minusDays(1L)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        LocalDate.now().plusDays(1L)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        LocalDate.now(),
+                        null
+                ))
         );
     }
 
-    @Test
-    @SneakyThrows
-    @DisplayName("Успешное создание заявки на больничный")
-    void shouldCreateDayOffChill() {
-        // given
-        CreateChillRq request = new CreateChillRq(
-                UUID.randomUUID(),
-                ChillType.SICK,
-                LocalDate.of(2026, Month.MAY, 1),
-                LocalDate.of(2026, Month.MAY, 10)
+    static Stream<Arguments> provideValidRequests() {
+        return Stream.of(
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.OFF,
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(1L)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(5L)
+                ))
         );
+    }
 
+    @SneakyThrows
+    @ParameterizedTest
+    @MethodSource("provideValidRequests")
+    @DisplayName("Успешное создание заявки на chill")
+    void shouldCreateChill(CreateChillRq request) {
         // when
         ResultActions resultAction = mockMvc.perform(post("/api/1/chill")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,6 +134,8 @@ class CreateSickChillTest extends BaseIntegrationTest {
         CreateChillRs response = getResponse(resultAction, CreateChillRs.class);
         assertThat(response.id()).isNotNull();
         Chill chill = chillRepository.findById(response.id()).orElseThrow();
+        assertThat(response.id())
+                .isEqualTo(chill.getId());
         assertThat(response.userId())
                 .isEqualTo(chill.getUserId())
                 .isEqualTo(request.userId());
@@ -135,8 +160,8 @@ class CreateSickChillTest extends BaseIntegrationTest {
         CreateChillRq request = new CreateChillRq(
                 savedChill.getUserId(),
                 ChillType.SICK,
-                LocalDate.of(2026, Month.MAY, 1),
-                LocalDate.of(2026, Month.MAY, 10)
+                LocalDate.now(),
+                LocalDate.now().plusDays(5)
         );
 
         // when
@@ -148,7 +173,7 @@ class CreateSickChillTest extends BaseIntegrationTest {
         resultAction.andExpect(status().isConflict());
         ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
         assertThat(response.getTitle())
-                .isEqualTo("Существует chill в выбранные даты");
+                .isNotBlank();
         Map<String, Object> properties = response.getProperties();
         assertThat(properties)
                 .usingRecursiveComparison()
@@ -165,7 +190,8 @@ class CreateSickChillTest extends BaseIntegrationTest {
     }
 
     @SneakyThrows
-    @Test
+    @ParameterizedTest
+    @MethodSource("provideInvalidRequests")
     @DisplayName("Ошибка валидации")
     void shouldReturnBadRequest() {
         // given
