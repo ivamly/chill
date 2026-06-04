@@ -38,7 +38,7 @@ class GetChillTest extends BaseIntegrationTest {
         Chill savedChill = chillRepository.save(dayOffChill);
 
         // when
-        ResultActions resultAction = mockMvc.perform(get("/api/1/chill/{id}", savedChill.getId()));
+        ResultActions resultAction = mockMvc.perform(get("/api/1/chills/{id}", savedChill.getId()));
 
         // then
         resultAction.andExpect(status().isOk());
@@ -68,7 +68,7 @@ class GetChillTest extends BaseIntegrationTest {
         Chill savedChill = chillRepository.save(sickChill);
 
         // when
-        ResultActions resultAction = mockMvc.perform(get("/api/1/chill/{id}", savedChill.getId()));
+        ResultActions resultAction = mockMvc.perform(get("/api/1/chills/{id}", savedChill.getId()));
 
         // then
         resultAction.andExpect(status().isOk());
@@ -90,7 +90,7 @@ class GetChillTest extends BaseIntegrationTest {
     @DisplayName("Получить информацию о несуществующем chill")
     void shouldReturnNotFound() {
         // when
-        ResultActions resultAction = mockMvc.perform(get("/api/1/chill/{id}", UUID.randomUUID()));
+        ResultActions resultAction = mockMvc.perform(get("/api/1/chills/{id}", UUID.randomUUID()));
 
         // then
         resultAction.andExpect(status().isNotFound());

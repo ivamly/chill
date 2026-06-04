@@ -125,7 +125,7 @@ class CreateChillTest extends BaseIntegrationTest {
     @DisplayName("Успешное создание заявки на chill")
     void shouldCreateChill(CreateChillRq request) {
         // when
-        ResultActions resultAction = mockMvc.perform(post("/api/1/chill")
+        ResultActions resultAction = mockMvc.perform(post("/api/1/chills")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getContent(request)));
 
@@ -165,7 +165,7 @@ class CreateChillTest extends BaseIntegrationTest {
         );
 
         // when
-        ResultActions resultAction = mockMvc.perform(post("/api/1/chill")
+        ResultActions resultAction = mockMvc.perform(post("/api/1/chills")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getContent(request)));
 
@@ -202,7 +202,7 @@ class CreateChillTest extends BaseIntegrationTest {
                 LocalDate.now().minusDays(1)
         );
         // when
-        ResultActions resultAction = mockMvc.perform(post("/api/1/chill")
+        ResultActions resultAction = mockMvc.perform(post("/api/1/chills")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getContent(request)));
 

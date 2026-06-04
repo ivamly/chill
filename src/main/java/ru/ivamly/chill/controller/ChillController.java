@@ -19,7 +19,7 @@ import ru.ivamly.chill.service.ChillService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("chill")
+@RequestMapping("/chills")
 @RequiredArgsConstructor
 public class ChillController { // TODO добавить сваггер
 
