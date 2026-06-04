@@ -8,6 +8,9 @@ import ru.ivamly.chill.entity.Chill;
 import ru.ivamly.chill.exception.handler.OverlappingChillException;
 import ru.ivamly.chill.repository.ChillRepository;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Collection;
 import java.util.UUID;
 
 @Service
@@ -27,5 +30,14 @@ public class ChillService {
     public Chill get(UUID id) {
         return chillRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    public Collection<Chill> findByUserId(UUID userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayPrevMonth = today.minusMonths(1)
+                .with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate lastDayNextMonth = today.plusMonths(1)
+                .with(TemporalAdjusters.lastDayOfMonth());
+        return chillRepository.findByUserIdAndDatesBetween(userId, firstDayPrevMonth, lastDayNextMonth);
     }
 }
