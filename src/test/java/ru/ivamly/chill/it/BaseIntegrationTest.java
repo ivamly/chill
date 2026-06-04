@@ -10,7 +10,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public abstract class BaseIntegrationTest { // TODO добавить конфигурацию api versioning
+abstract class BaseIntegrationTest { // TODO добавить конфигурацию api versioning
 
     @Autowired
     protected MockMvc mockMvc;
