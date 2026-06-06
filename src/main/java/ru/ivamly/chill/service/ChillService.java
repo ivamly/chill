@@ -40,4 +40,8 @@ public class ChillService {
                 .with(TemporalAdjusters.lastDayOfMonth());
         return chillRepository.findByUserIdAndDatesBetween(userId, firstDayPrevMonth, lastDayNextMonth);
     }
+
+    public void delete(UUID id) {
+        chillRepository.deleteById(id);
+    }
 }
