@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("Удалить chill")
-public class DeleteChillTest extends BaseIntegrationTest {
+class DeleteChillTest extends BaseIntegrationTest {
 
     @Autowired
     private ChillRepository chillRepository;
@@ -36,7 +36,7 @@ public class DeleteChillTest extends BaseIntegrationTest {
         Chill savedChill = chillRepository.save(chill);
 
         // when
-        ResultActions resultAction = mockMvc.perform(delete("/api/1/chill/{id}", savedChill.getId()));
+        ResultActions resultAction = mockMvc.perform(delete("/api/1/chills/{id}", savedChill.getId()));
 
         // then
         resultAction.andExpect(status().isNoContent());
@@ -51,7 +51,7 @@ public class DeleteChillTest extends BaseIntegrationTest {
         UUID nonExistingId = UUID.randomUUID();
 
         // when
-        ResultActions resultAction = mockMvc.perform(delete("/api/1/chill/{id}", nonExistingId));
+        ResultActions resultAction = mockMvc.perform(delete("/api/1/chills/{id}", nonExistingId));
 
         // then
         resultAction.andExpect(status().isNoContent());
