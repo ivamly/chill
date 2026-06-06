@@ -7,6 +7,8 @@ import ru.ivamly.chill.dto.ChillInfo;
 import ru.ivamly.chill.dto.CreateChillRq;
 import ru.ivamly.chill.dto.CreateChillRs;
 import ru.ivamly.chill.dto.GetChillRs;
+import ru.ivamly.chill.dto.UpdateChillRq;
+import ru.ivamly.chill.dto.UpdateChillRs;
 import ru.ivamly.chill.entity.Chill;
 
 import java.util.Collection;
@@ -21,7 +23,12 @@ public interface ChillMapper {
 
     Collection<ChillInfo> map(Collection<Chill> source);
 
+    @Mapping(target = "id", ignore = true)
+    Chill map(UpdateChillRq source);
+
     CreateChillRs mapToCreateChillRs(Chill source);
 
     GetChillRs mapToGetChillRs(Chill source);
+
+    UpdateChillRs mapToUpdateChillRs(Chill source);
 }

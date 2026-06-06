@@ -21,6 +21,17 @@ public interface ChillRepository extends JpaRepository<Chill, UUID> {
     boolean existsOverlappingChill(UUID userId, LocalDate startDate, LocalDate endDate);
 
     @Query("""
+            SELECT EXISTS (
+                SELECT 1 FROM Chill c
+                WHERE c.userId = :userId
+                AND c.startDate <= :endDate
+                AND c.endDate >= :startDate
+                AND c.id NOT IN (:ids)
+            )
+            """)
+    boolean existsOverlappingChillExcludingIds(UUID userId, LocalDate startDate, LocalDate endDate, UUID... ids);
+
+    @Query("""
             SELECT c FROM Chill c
             WHERE c.userId = :userId
             AND c.startDate <= :end

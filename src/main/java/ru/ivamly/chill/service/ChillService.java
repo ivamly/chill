@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ivamly.chill.entity.Chill;
-import ru.ivamly.chill.exception.handler.OverlappingChillException;
+import ru.ivamly.chill.exception.OverlappingChillException;
 import ru.ivamly.chill.repository.ChillRepository;
 
 import java.time.LocalDate;
@@ -24,6 +24,18 @@ public class ChillService {
         if (chillRepository.existsOverlappingChill(chill.getUserId(), chill.getStartDate(), chill.getEndDate())) {
             throw new OverlappingChillException(chill.getUserId(), chill.getStartDate(), chill.getEndDate());
         }
+        return chillRepository.save(chill);
+    }
+
+    @Transactional
+    public Chill update(UUID id, Chill chill) {
+        if (!chillRepository.existsById(id)) {
+            throw new EntityNotFoundException();
+        }
+        if (chillRepository.existsOverlappingChillExcludingIds(chill.getUserId(), chill.getStartDate(), chill.getEndDate(), id)) {
+            throw new OverlappingChillException(chill.getUserId(), chill.getStartDate(), chill.getEndDate());
+        }
+        chill.setId(id);
         return chillRepository.save(chill);
     }
 
