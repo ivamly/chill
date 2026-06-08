@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.ivamly.chill.exception.ChillModificationNotAllowedException;
 import ru.ivamly.chill.exception.OverlappingChillException;
 
 import java.time.Instant;
@@ -22,6 +23,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problem.setProperty("userId", ex.getUserId());
         problem.setProperty("startDate", ex.getStartDate());
         problem.setProperty("endDate", ex.getEndDate());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(problem);
+    }
+
+    @ExceptionHandler(ChillModificationNotAllowedException.class)
+    public ResponseEntity<ProblemDetail> handle(ChillModificationNotAllowedException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Нельзя модифицировать chill после его начала");
+        problem.setProperty("timestamp", Instant.now());
+        problem.setProperty("userId", ex.getUserId());
+        problem.setProperty("chillStartDate", ex.getChillStartDate());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(problem);
     }
