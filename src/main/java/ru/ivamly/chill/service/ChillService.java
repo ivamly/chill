@@ -11,7 +11,7 @@ import ru.ivamly.chill.exception.OverlappingChillException;
 import ru.ivamly.chill.repository.ChillRepository;
 
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
+import java.time.YearMonth;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public class ChillService {
     public Chill update(UUID id, Chill chill) {
         Chill existingChill = chillRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        if (!existingChill.getStartDate().isAfter(LocalDate.now())) {
+        if (existingChill.isStarted()) {
             throw new ChillModificationNotAllowedException(existingChill.getUserId(), existingChill.getStartDate());
         }
         if (chillRepository.existsOverlappingChillExcludingIds(chill.getUserId(), chill.getStartDate(), chill.getEndDate(), id)) {
@@ -54,11 +54,8 @@ public class ChillService {
 
     @Transactional(readOnly = true)
     public Collection<Chill> findByUserId(UUID userId) {
-        LocalDate today = LocalDate.now();
-        LocalDate firstDayPrevMonth = today.minusMonths(1)
-                .with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate lastDayNextMonth = today.plusMonths(1)
-                .with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate firstDayPrevMonth = YearMonth.now().minusMonths(1).atDay(1);
+        LocalDate lastDayNextMonth = YearMonth.now().plusMonths(1).atEndOfMonth();
         return chillRepository.findByUserIdAndDatesBetween(userId, firstDayPrevMonth, lastDayNextMonth);
     }
 
@@ -66,7 +63,7 @@ public class ChillService {
     public void delete(UUID id) {
         chillRepository.findById(id)
                 .ifPresent(chill -> {
-                    if (!chill.getStartDate().isAfter(LocalDate.now())) {
+                    if (chill.isStarted()) {
                         throw new ChillModificationNotAllowedException(chill.getUserId(), chill.getStartDate());
                     }
                     chillRepository.delete(chill);

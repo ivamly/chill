@@ -70,6 +70,13 @@ public class UpdateChillTest extends BaseIntegrationTest {
                         "",
                         LocalDate.now(),
                         LocalDate.now().plusDays(1)
+                )),
+                Arguments.of(new UpdateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        LocalDate.now().minusDays(1),
+                        LocalDate.now().plusDays(1)
                 ))
         );
     }
@@ -157,6 +164,7 @@ public class UpdateChillTest extends BaseIntegrationTest {
                 .content(getContent(request)));
 
         // then
+        String timestamp = "timestamp";
         resultAction.andExpect(status().isConflict());
         ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
         assertThat(response.getTitle())
@@ -164,7 +172,7 @@ public class UpdateChillTest extends BaseIntegrationTest {
         Map<String, Object> properties = response.getProperties();
         assertThat(properties)
                 .usingRecursiveComparison()
-                .ignoringFields("timestamp")
+                .ignoringFields(timestamp)
                 .isEqualTo(
                         Map.of(
                                 "userId", request.userId().toString(),
@@ -172,7 +180,7 @@ public class UpdateChillTest extends BaseIntegrationTest {
                                 "endDate", request.endDate().toString()
                         )
                 );
-        assertThat(Instant.parse((String) response.getProperties().get("timestamp")))
+        assertThat(Instant.parse((String) response.getProperties().get(timestamp)))
                 .isCloseTo(Instant.now(), within(1, ChronoUnit.SECONDS));
     }
 
@@ -228,16 +236,16 @@ public class UpdateChillTest extends BaseIntegrationTest {
         Chill existingChill = new Chill();
         existingChill.setUserId(userId);
         existingChill.setType(ChillType.SICK);
-        existingChill.setStartDate(LocalDate.now());
-        existingChill.setEndDate(LocalDate.now().plusDays(1));
+        existingChill.setStartDate(LocalDate.now().minusDays(1));
+        existingChill.setEndDate(LocalDate.now().plusDays(11));
         chillRepository.save(existingChill);
 
         UpdateChillRq request = new UpdateChillRq(
                 userId,
                 ChillType.SICK,
                 null,
-                LocalDate.now().minusDays(10),
-                LocalDate.now().plusDays(1)
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(11)
         );
 
         // when
@@ -246,22 +254,24 @@ public class UpdateChillTest extends BaseIntegrationTest {
                 .content(getContent(request)));
 
         // then
+        String timestamp = "timestamp";
         resultAction.andExpect(status().isConflict());
-        assertThat(chillRepository.findById(existingChill.getId())).isPresent();
+        assertThat(chillRepository.findById(existingChill.getId()))
+                .isPresent();
         ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
         assertThat(response.getTitle())
                 .isNotBlank();
         Map<String, Object> properties = response.getProperties();
         assertThat(properties)
                 .usingRecursiveComparison()
-                .ignoringFields("timestamp")
+                .ignoringFields(timestamp)
                 .isEqualTo(
                         Map.of(
                                 "userId", existingChill.getUserId().toString(),
                                 "chillStartDate", existingChill.getStartDate().toString()
                         )
                 );
-        assertThat(Instant.parse((String) response.getProperties().get("timestamp")))
+        assertThat(Instant.parse((String) response.getProperties().get(timestamp)))
                 .isCloseTo(Instant.now(), within(1, ChronoUnit.SECONDS));
     }
 }

@@ -44,7 +44,8 @@ class DeleteChillTest extends BaseIntegrationTest {
 
         // then
         resultAction.andExpect(status().isNoContent());
-        assertThat(chillRepository.findById(savedChill.getId())).isEmpty();
+        assertThat(chillRepository.findById(savedChill.getId()))
+                .isEmpty();
     }
 
     @Test
@@ -59,7 +60,8 @@ class DeleteChillTest extends BaseIntegrationTest {
 
         // then
         resultAction.andExpect(status().isNoContent());
-        assertThat(chillRepository.findById(nonExistingId)).isEmpty();
+        assertThat(chillRepository.findById(nonExistingId))
+                .isEmpty();
     }
 
     @Test
@@ -78,6 +80,7 @@ class DeleteChillTest extends BaseIntegrationTest {
         ResultActions resultAction = mockMvc.perform(delete("/api/1/chills/{id}", savedChill.getId()));
 
         // then
+        String timestamp = "timestamp";
         resultAction.andExpect(status().isConflict());
         assertThat(chillRepository.findById(savedChill.getId())).isPresent();
         ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
@@ -86,14 +89,14 @@ class DeleteChillTest extends BaseIntegrationTest {
         Map<String, Object> properties = response.getProperties();
         assertThat(properties)
                 .usingRecursiveComparison()
-                .ignoringFields("timestamp")
+                .ignoringFields(timestamp)
                 .isEqualTo(
                         Map.of(
                                 "userId", chill.getUserId().toString(),
                                 "chillStartDate", chill.getStartDate().toString()
                         )
                 );
-        assertThat(Instant.parse((String) response.getProperties().get("timestamp")))
+        assertThat(Instant.parse((String) response.getProperties().get(timestamp)))
                 .isCloseTo(Instant.now(), within(1, ChronoUnit.SECONDS));
     }
 }
