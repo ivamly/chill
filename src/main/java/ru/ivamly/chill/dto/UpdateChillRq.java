@@ -12,11 +12,17 @@ public record UpdateChillRq(
         UUID userId, // TODO это поле будет браться из LDAP?
         @NotNull
         ChillType type,
+        String comment,
         LocalDate startDate,
         LocalDate endDate
 ) {
     @AssertTrue
     public boolean isStartBeforeOrEqualEnd() {
         return startDate != null && endDate != null && !startDate.isAfter(endDate);
+    }
+
+    @AssertTrue // TODO для этой проверки должна появится аннотация в hibernate-validator 9.2
+    public boolean isCommentNullOrNotBlank() {
+        return comment == null || !comment.isBlank();
     }
 }

@@ -9,6 +9,7 @@ public record UpdateChillRs(
         UUID id,
         UUID userId,
         ChillType type,
+        String comment,
         LocalDate startDate,
         LocalDate endDate
 ) {

@@ -78,12 +78,7 @@ class CreateChillTest extends BaseIntegrationTest {
                 Arguments.of(new CreateChillRq(
                         UUID.randomUUID(),
                         ChillType.OFF,
-                        LocalDate.now(),
-                        LocalDate.now().minusDays(1L)
-                )),
-                Arguments.of(new CreateChillRq(
-                        UUID.randomUUID(),
-                        ChillType.SICK,
+                        null,
                         LocalDate.now(),
                         LocalDate.now().minusDays(1L)
                 )),
@@ -91,13 +86,29 @@ class CreateChillTest extends BaseIntegrationTest {
                         UUID.randomUUID(),
                         ChillType.SICK,
                         null,
+                        LocalDate.now(),
+                        LocalDate.now().minusDays(1L)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        null,
                         LocalDate.now().plusDays(1L)
                 )),
                 Arguments.of(new CreateChillRq(
                         UUID.randomUUID(),
                         ChillType.SICK,
+                        null,
                         LocalDate.now(),
                         null
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        "",
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(1)
                 ))
         );
     }
@@ -107,12 +118,14 @@ class CreateChillTest extends BaseIntegrationTest {
                 Arguments.of(new CreateChillRq(
                         UUID.randomUUID(),
                         ChillType.OFF,
+                        "some comment",
                         LocalDate.now(),
                         LocalDate.now().plusDays(1L)
                 )),
                 Arguments.of(new CreateChillRq(
                         UUID.randomUUID(),
                         ChillType.SICK,
+                        "some comment",
                         LocalDate.now(),
                         LocalDate.now().plusDays(5L)
                 ))
@@ -142,6 +155,9 @@ class CreateChillTest extends BaseIntegrationTest {
         assertThat(response.type())
                 .isEqualTo(chill.getType())
                 .isEqualTo(request.type());
+        assertThat(response.comment())
+                .isEqualTo(chill.getComment())
+                .isEqualTo(request.comment());
         assertThat(response.startDate())
                 .isEqualTo(chill.getStartDate())
                 .isEqualTo(request.startDate());
@@ -160,6 +176,7 @@ class CreateChillTest extends BaseIntegrationTest {
         CreateChillRq request = new CreateChillRq(
                 savedChill.getUserId(),
                 ChillType.SICK,
+                null,
                 LocalDate.now(),
                 LocalDate.now().plusDays(5)
         );
