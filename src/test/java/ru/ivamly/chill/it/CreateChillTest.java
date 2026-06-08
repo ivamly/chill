@@ -193,14 +193,7 @@ class CreateChillTest extends BaseIntegrationTest {
     @ParameterizedTest
     @MethodSource("provideInvalidRequests")
     @DisplayName("Ошибка валидации")
-    void shouldReturnBadRequest() {
-        // given
-        CreateChillRq request = new CreateChillRq(
-                UUID.randomUUID(),
-                ChillType.SICK,
-                LocalDate.now(),
-                LocalDate.now().minusDays(1)
-        );
+    void shouldReturnBadRequest(CreateChillRq request) {
         // when
         ResultActions resultAction = mockMvc.perform(post("/api/1/chills")
                 .contentType(MediaType.APPLICATION_JSON)

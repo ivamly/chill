@@ -1,4 +1,4 @@
-package ru.ivamly.chill.exception.handler;
+package ru.ivamly.chill.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
