@@ -3,7 +3,9 @@
 {
 	"name": "Java",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/java:3-25-trixie",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "devcontainer",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
@@ -23,20 +25,11 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"rangav.vscode-thunder-client",
+				"vmware.vscode-boot-dev-pack",
+				"humao.rest-client",
 				"cweijan.dbclient-jdbc",
-				"cweijan.vscode-database-client2",
-				"vmware.vscode-boot-dev-pack"
-			],
-			"settings": {
-				// Maven
-				"maven.terminal.favorites": [
-					{
-						"command": "clean install -DskipTests",
-						"debug": false
-					}
-				]
-			}
+				"cweijan.vscode-database-client2"
+			]
 		}
 	}
 
