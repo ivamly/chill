@@ -20,6 +20,7 @@ public class Chill {
     private UUID id;
     private UUID userId;
     private ChillType type;
+    private String comment;
     private LocalDate startDate;
     private LocalDate endDate;
 }
