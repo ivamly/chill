@@ -70,6 +70,13 @@ public class UpdateChillTest extends BaseIntegrationTest {
                         "",
                         LocalDate.now(),
                         LocalDate.now().plusDays(1)
+                )),
+                Arguments.of(new UpdateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        LocalDate.now().minusDays(1),
+                        LocalDate.now().plusDays(1)
                 ))
         );
     }
@@ -229,15 +236,15 @@ public class UpdateChillTest extends BaseIntegrationTest {
         existingChill.setUserId(userId);
         existingChill.setType(ChillType.SICK);
         existingChill.setStartDate(LocalDate.now());
-        existingChill.setEndDate(LocalDate.now().plusDays(1));
+        existingChill.setEndDate(LocalDate.now().plusDays(2));
         chillRepository.save(existingChill);
 
         UpdateChillRq request = new UpdateChillRq(
                 userId,
                 ChillType.SICK,
                 null,
-                LocalDate.now().minusDays(10),
-                LocalDate.now().plusDays(1)
+                LocalDate.now(),
+                LocalDate.now().plusDays(10)
         );
 
         // when
