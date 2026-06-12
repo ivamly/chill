@@ -17,6 +17,7 @@ import java.util.Collection;
 public interface ChillMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     Chill map(CreateChillRq source);
 
     ChillInfo map(Chill source);
@@ -24,6 +25,7 @@ public interface ChillMapper {
     Collection<ChillInfo> map(Collection<Chill> source);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     Chill map(UpdateChillRq source);
 
     CreateChillRs mapToCreateChillRs(Chill source);

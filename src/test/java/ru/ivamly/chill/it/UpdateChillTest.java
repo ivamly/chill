@@ -70,6 +70,13 @@ public class UpdateChillTest extends BaseIntegrationTest {
                         "",
                         LocalDate.now(),
                         LocalDate.now().plusDays(1)
+                )),
+                Arguments.of(new UpdateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        LocalDate.now().minusDays(1),
+                        LocalDate.now().plusDays(1)
                 ))
         );
     }
@@ -82,16 +89,16 @@ public class UpdateChillTest extends BaseIntegrationTest {
         Chill chill = new Chill();
         chill.setUserId(UUID.randomUUID());
         chill.setType(ChillType.SICK);
-        chill.setStartDate(LocalDate.now().minusDays(10));
-        chill.setEndDate(LocalDate.now());
+        chill.setStartDate(LocalDate.now().plusDays(1));
+        chill.setEndDate(LocalDate.now().plusDays(10));
         Chill savedChill = chillRepository.save(chill);
 
         UpdateChillRq request = new UpdateChillRq(
                 savedChill.getUserId(),
                 ChillType.SICK,
                 "some comment",
-                LocalDate.now().minusDays(10),
-                LocalDate.now().plusDays(5)
+                LocalDate.now().plusDays(10),
+                LocalDate.now().plusDays(20)
         );
 
         // when
@@ -125,30 +132,30 @@ public class UpdateChillTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     @DisplayName("Ошибка обновления при пересечении с существующим chill")
-    void shouldReturnConflict() {
+    void shouldReturnConflictWhenChillOverlap() {
         // given
         UUID userId = UUID.randomUUID();
 
         Chill existingChill = new Chill();
         existingChill.setUserId(userId);
         existingChill.setType(ChillType.SICK);
-        existingChill.setStartDate(LocalDate.now().plusDays(1));
-        existingChill.setEndDate(LocalDate.now().plusDays(11));
+        existingChill.setStartDate(LocalDate.now().plusDays(10));
+        existingChill.setEndDate(LocalDate.now().plusDays(20));
         chillRepository.save(existingChill);
 
         Chill chillToUpdate = new Chill();
         chillToUpdate.setUserId(userId);
         chillToUpdate.setType(ChillType.SICK);
-        chillToUpdate.setStartDate(LocalDate.now().minusDays(10));
-        chillToUpdate.setEndDate(LocalDate.now());
+        chillToUpdate.setStartDate(LocalDate.now().plusDays(1));
+        chillToUpdate.setEndDate(LocalDate.now().plusDays(2));
         Chill savedChillToUpdate = chillRepository.save(chillToUpdate);
 
         UpdateChillRq request = new UpdateChillRq(
                 userId,
                 ChillType.SICK,
                 null,
-                LocalDate.now().minusDays(10),
-                LocalDate.now().plusDays(1)
+                LocalDate.now().plusDays(10),
+                LocalDate.now().plusDays(11)
         );
 
         // when
@@ -216,5 +223,52 @@ public class UpdateChillTest extends BaseIntegrationTest {
         ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
         assertThat(response.getTitle())
                 .isEqualTo("Bad Request");
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Ошибка обновления начавшегося chill")
+    void shouldReturnConflictWhenChillStarted() {
+        // given
+        UUID userId = UUID.randomUUID();
+
+        Chill existingChill = new Chill();
+        existingChill.setUserId(userId);
+        existingChill.setType(ChillType.SICK);
+        existingChill.setStartDate(LocalDate.now());
+        existingChill.setEndDate(LocalDate.now().plusDays(2));
+        chillRepository.save(existingChill);
+
+        UpdateChillRq request = new UpdateChillRq(
+                userId,
+                ChillType.SICK,
+                null,
+                LocalDate.now(),
+                LocalDate.now().plusDays(10)
+        );
+
+        // when
+        ResultActions resultAction = mockMvc.perform(put("/api/1/chills/{id}", existingChill.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getContent(request)));
+
+        // then
+        resultAction.andExpect(status().isConflict());
+        assertThat(chillRepository.findById(existingChill.getId())).isPresent();
+        ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
+        assertThat(response.getTitle())
+                .isNotBlank();
+        Map<String, Object> properties = response.getProperties();
+        assertThat(properties)
+                .usingRecursiveComparison()
+                .ignoringFields("timestamp")
+                .isEqualTo(
+                        Map.of(
+                                "userId", existingChill.getUserId().toString(),
+                                "chillStartDate", existingChill.getStartDate().toString()
+                        )
+                );
+        assertThat(Instant.parse((String) response.getProperties().get("timestamp")))
+                .isCloseTo(Instant.now(), within(1, ChronoUnit.SECONDS));
     }
 }

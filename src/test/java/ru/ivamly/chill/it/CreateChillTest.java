@@ -109,6 +109,13 @@ class CreateChillTest extends BaseIntegrationTest {
                         "",
                         LocalDate.now(),
                         LocalDate.now().plusDays(1)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        LocalDate.now().minusDays(1),
+                        LocalDate.now().plusDays(1)
                 ))
         );
     }
