@@ -1,14 +1,8 @@
 package ru.ivamly.chill.it;
 
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.ResultActions;
-import ru.ivamly.chill.dto.GetChillsRs;
-import ru.ivamly.chill.entity.Chill;
-import ru.ivamly.chill.entity.enums.ChillType;
-import ru.ivamly.chill.repository.ChillRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -16,9 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
+
+import lombok.SneakyThrows;
+import ru.ivamly.chill.dto.GetChillsRs;
+import ru.ivamly.chill.entity.Chill;
+import ru.ivamly.chill.entity.enums.ChillType;
+import ru.ivamly.chill.repository.ChillRepository;
 
 @DisplayName("Получение chills")
 class GetChillsTest extends BaseIntegrationTest {
