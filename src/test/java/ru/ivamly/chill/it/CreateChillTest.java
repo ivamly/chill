@@ -109,6 +109,13 @@ class CreateChillTest extends BaseIntegrationTest {
                         "",
                         LocalDate.now(),
                         LocalDate.now().plusDays(1)
+                )),
+                Arguments.of(new CreateChillRq(
+                        UUID.randomUUID(),
+                        ChillType.SICK,
+                        null,
+                        LocalDate.now().minusDays(1),
+                        LocalDate.now().plusDays(1)
                 ))
         );
     }
@@ -145,7 +152,8 @@ class CreateChillTest extends BaseIntegrationTest {
         // then
         resultAction.andExpect(status().isCreated());
         CreateChillRs response = getResponse(resultAction, CreateChillRs.class);
-        assertThat(response.id()).isNotNull();
+        assertThat(response.id())
+                .isNotNull();
         Chill chill = chillRepository.findById(response.id()).orElseThrow();
         assertThat(response.id())
                 .isEqualTo(chill.getId());
@@ -187,6 +195,7 @@ class CreateChillTest extends BaseIntegrationTest {
                 .content(getContent(request)));
 
         // then
+        String timestamp = "timestamp";
         resultAction.andExpect(status().isConflict());
         ProblemDetail response = getResponse(resultAction, ProblemDetail.class);
         assertThat(response.getTitle())
@@ -194,7 +203,7 @@ class CreateChillTest extends BaseIntegrationTest {
         Map<String, Object> properties = response.getProperties();
         assertThat(properties)
                 .usingRecursiveComparison()
-                .ignoringFields("timestamp")
+                .ignoringFields(timestamp)
                 .isEqualTo(
                         Map.of(
                                 "userId", request.userId().toString(),
@@ -202,7 +211,7 @@ class CreateChillTest extends BaseIntegrationTest {
                                 "endDate", request.endDate().toString()
                         )
                 );
-        assertThat(Instant.parse((String) response.getProperties().get("timestamp")))
+        assertThat(Instant.parse((String) response.getProperties().get(timestamp)))
                 .isCloseTo(Instant.now(), within(1, ChronoUnit.SECONDS));
     }
 

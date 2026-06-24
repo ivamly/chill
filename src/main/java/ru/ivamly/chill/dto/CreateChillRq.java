@@ -1,6 +1,7 @@
 package ru.ivamly.chill.dto;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import ru.ivamly.chill.entity.enums.ChillType;
 
@@ -13,6 +14,7 @@ public record CreateChillRq(
         @NotNull
         ChillType type,
         String comment,
+        @FutureOrPresent
         LocalDate startDate,
         LocalDate endDate
 ) {

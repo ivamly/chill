@@ -23,4 +23,8 @@ public class Chill {
     private String comment;
     private LocalDate startDate;
     private LocalDate endDate;
+
+    public boolean isStarted() {
+        return !getStartDate().isAfter(LocalDate.now());
+    }
 }
