@@ -4,7 +4,10 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
 import ru.ivamly.chill.dto.GetChillsRs;
 import ru.ivamly.chill.entity.Chill;
 import ru.ivamly.chill.entity.enums.ChillType;
@@ -50,7 +53,9 @@ class GetChillsTest extends BaseIntegrationTest {
         List<Chill> savedChills = chillRepository.saveAll(chills);
 
         // when
-        ResultActions resultAction = mockMvc.perform(get("/api/1/users/{id}/chills", userId));
+        // TODO вынести настройку mockMvc в конфигурации
+        ResultActions resultAction = mockMvc.perform(get("/api/1/users/{id}/chills", userId)
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin")));
 
         // then
         resultAction.andExpect(status().isOk());
